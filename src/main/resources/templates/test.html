@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+</head>
+<body>
+	<div sec:authorize="isAuthenticated()">
+	  This content is only shown to authenticated users.
+	</div>
+	<div sec:authorize="hasRole('ROLE_ADMIN')">
+	  This content is only shown to administrators.
+	</div>
+	<div sec:authorize="hasRole('ROLE_USER')">
+	  This content is only shown to users.
+	</div>
+	<div sec:authentication="principal">
+	</div>
+	<div th:text="${#authentication.name}"></div>
+	<div th:text="${loggedInUser.name}"></div>
+	<div th:text="${loggedInUser.id}"></div>
+	<div th:text="${loggedInUser.password}"></div>
+	<div th:text="${loggedInUser.role}"></div>
+
+
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">SNS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">홈</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">타임라인</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">프로필</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" sec:authorize="isAnonymous()"> 
+                    <a class="nav-link" href="/login">로그인</a>
+					<a class="nav-link" href="/join">회원가입</a>
+                </li>
+                <li class="nav-item" sec:authorize="isAuthenticated()">
+                    <form action="/logout" method="post">
+                        <button class="btn btn-link nav-link" type="submit">로그아웃</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+
+
+	<!-- 포스트 작성 폼 -->
+	<div class="post-form" sec:authorize="isAuthenticated()">
+		<form action="/posts/create" method="post">
+			<div class="mb-3 d-flex align-items-center">
+				<div class="user-profile">
+					<img class="profile-photo" th:src="@{/profile-photos/{filename}(filename=${loggedInUser.profilePhoto})}" alt="Profile Image">
+				</div>
+				<span class="name" th:text="${loggedInUser.name}">loggedInUser.name</span>
+			</div>
+			<div class="mb-3">
+				<label for="content" class="form-label">Content:</label>
+				<textarea class="form-control" id="content" name="content" rows="3" placeholder="Enter your post"></textarea>
+			</div>
+			<button type="submit" class="btn btn-primary">작성</button>
+		</form>
+	</div>
+
+
+	<ul class="post-list">
+		<li class="post-item" th:each="post : ${posts}">
+			<div class="user-profile">
+				<img class="profile-photo" th:src="@{/profile-photos/{filename}(filename=${post.user.profilePhoto})}">
+				<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
+			</div>
+			<p class="post-content" th:text="${post.content}">post.contenttest</p>
+			<button class="post-like-button">좋아요</button>
+
+			<!-- 댓글 목록 -->
+			<ul class="comment-list">
+				<li class="comment-item" th:each="comment : ${post.comments}">
+					<div class="user-profile">
+						<img class="profile-photo" th:src="@{/profile-photos/{filename}(filename=${comment.user.profilePhoto})}">
+						<p class="comment-name" th:text="${comment.user.name}">comment.user.nametest</p>
+					</div>
+					<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
+				</li>
+			</ul>
+
+			<!-- 댓글 작성 폼 -->
+			<div class="comment-form" sec:authorize="isAuthenticated()" style="display: none;">
+				<form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
+					<div class="mb-3 d-flex align-items-center">
+						<div class="user-profile">
+							<img class="profile-photo" th:src="@{/profile-photos/{filename}(filename=${loggedInUser.profilePhoto})}">
+						</div>
+						<div class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</div>
+					</div>
+					<div class="mb-3">
+						<label for="comment-content" class="form-label">Content:</label>
+						<textarea class="form-control" id="comment-content" name="content" rows="3" placeholder="Enter your comment"></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">Comment</button>
+				</form>
+			</div>
+			<button class="toggle-comment-form-button btn btn-link">댓글 작성</button>
+
+		</li>
+	</ul>
+	
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.0/dist/jquery.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+	<script>
+        // jQuery 코드 추가
+        $(document).ready(function () {
+            $('.post-like-button').click(function () {
+                $(this).toggleClass('liked');
+            });
+            
+            $('.toggle-comment-list-button').click(function () {
+                var $commentList = $(this).siblings('.comment-list');
+                $commentList.toggle();
+                
+                if ($commentList.is(':visible')) {
+                    $(this).text('댓글 숨기기');
+                } else {
+                    $(this).text('댓글 보기');
+                }
+            });
+
+            $('.cancel-comment-button').click(function () {
+                var $commentForm = $(this).closest('.comment-form');
+                $commentForm.hide();
+                
+                var $toggleCommentFormButton = $commentForm.siblings('.toggle-comment-form-button');
+                $toggleCommentFormButton.text('댓글 작성');
+            });
+
+            $('.toggle-comment-form-button').click(function () {
+                var $commentForm = $(this).siblings('.comment-form');
+                $commentForm.toggle();
+                
+                if ($commentForm.is(':visible')) {
+                    $(this).text('취소');
+                } else {
+                    $(this).text('댓글 작성');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+<!-- ?
+
+@AuthenticationPrincipal MemberDTO memberDTO
+loggedInUser
+
+ -->

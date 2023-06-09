@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" 
+				xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+				layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+    
+    <div class="sns-container">
+        
+        <div class="profile-wrapper">
+		    <form method="POST" action="/profile/save" enctype="multipart/form-data" id="profile-modify-form">
+	        	<div class="row">
+	        		<!-- 프로필 사진 수정 -->
+	        		<div class="col-5">
+	        			<div style="padding: 2vw;">
+							<img id="preview-profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}" style="height: 200px; width: 200px; border-radius: 50%;">
+	        			</div>
+	        			
+						<input type="hidden" id="original-profilePhoto" th:value="${loggedInUser.profilePhoto}"/>
+						<input type="hidden" id="current-profilePhoto" th:value="${loggedInUser.profilePhoto}"/>
+						<input type="hidden" id="isFileUpdate" value=""/>
+						<label for="new-profileImage" class="form-label">프로필 사진:</label>
+	           			<input type="file" accept=".jpg, .png" class="form-control" id="new-profileImage" name="newProfileImage">
+	           			<button type="button" id="file-reset" class="btn btn-warning">초기화</button>
+	           			
+	        		</div>
+	        		
+	        		<!-- 일반 정보 수정 폼 -->
+	        		<div class="col-7">
+	        			<h2>프로필 수정</h2>
+					        <div class="mb-3">
+					            <label for="name" class="form-label">이름:</label>
+					            <input type="text" class="form-control" id="name" name="name" th:value="${loggedInUser.name}">
+					        </div>
+					        <div class="mb-3">
+					            <label for="email" class="form-label">이메일:</label>
+					            <input type="email" class="form-control" id="email" name="email" th:value="${loggedInUser.email}">
+					        </div>
+					        <div class="mb-3">
+					            <label for="bio" class="form-label">소개:</label>
+					            <textarea class="form-control" id="bio" name="bio" th:text="${loggedInUser.bio}"></textarea>
+					        </div>
+					        <div class="mb-3">
+					            <button type="submit" class="btn btn-primary">저장</button>
+					        </div>
+	        		</div>
+	        	</div>
+		    </form>
+        </div>
+
+    </div>
+    
+    
+</th:block>
+<th:block layout:fragment="customScript">
+	<script th:inline="javascript">
+		$(document).ready(function () {
+			$("#new-profileImage").change(function() {
+				const file = this.files[0];
+		        if (file){
+					let reader = new FileReader();
+					reader.onload = function(event){
+						console.log(event.target.result);
+						$("#preview-profile-photo").attr("src",event.target.result);
+					}
+					reader.readAsDataURL(file);
+		        }
+			});
+			
+			/*<![CDATA[*/ 
+			$("#file-reset").click(function() {
+				let context = /*[[@{/profile/photo/}]]*/;
+				let orgImageName = $("#original-profilePhoto").val();
+				
+				
+				$("#preview-profile-photo").attr("src", context + orgImageName);
+			});
+			/*]]>*/
+			
+		});
+	
+	</script>
+</th:block>
+    
+    

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+	<th:block th:fragment="navbar">
+	
+		<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+	        <div class="container">
+	            <a class="navbar-brand" href="#">SNS</a>
+	            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+	                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+	                <span class="navbar-toggler-icon"></span>
+	            </button>
+	            <div class="collapse navbar-collapse" id="navbarNav">
+	                <ul class="navbar-nav ml-auto">
+	                    <li class="nav-item">
+	                        <a class="nav-link" href="#">타임라인</a>
+	                    </li>
+	                </ul>
+	            </div>
+	            <ul class="navbar-nav ms-auto" style="flex-direction: row !important;" sec:authorize="isAnonymous()">
+	                <li class="nav-item" style=" padding-right:var(--bs-navbar-nav-link-padding-x) !important; padding-left: var(--bs-navbar-nav-link-padding-x) !important;">
+	                    <a class="nav-link" href="/login">로그인</a>
+	                </li>
+	                <li class="nav-item" style=" padding-right:var(--bs-navbar-nav-link-padding-x) !important; padding-left: var(--bs-navbar-nav-link-padding-x) !important;">
+						<a class="nav-link" href="/join">회원가입</a>
+					</li>
+	            </ul>
+	            <ul class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
+	                <li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle nav-user-profile" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						 	<img class="nav-profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}" alt="Profile Image">
+				 		</a>
+						 
+						<ul class="dropdown-menu" style="left: -140%;">
+							<li>
+							  	<a class="dropdown-item" href="/profile">프로필</a>
+						  	</li>
+							<li>
+							  	<a class="dropdown-item" href="/logout">로그아웃</a>
+						  	</li>
+						</ul>
+					</li>
+                </ul>
+	        </div>
+	    </nav>
+	    
+    </th:block>
+
+</html>

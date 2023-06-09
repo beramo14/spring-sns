@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+	<meta charset="UTF-8">
+	<title>S N S</title>
+	<th:block th:replace="layout/fragments/style :: style"></th:block>
+</head>
+<body>
+	<th:block th:replace="layout/fragments/navbar :: navbar"></th:block>
+	
+	<th:block layout:fragment="content"></th:block>
+	
+	<th:block th:replace="layout/fragments/footer :: footer"></th:block>
+	<th:block th:replace="layout/fragments/script :: script"></th:block>
+	<th:block layout:fragment="customScript"></th:block>
+</body>
+</html>

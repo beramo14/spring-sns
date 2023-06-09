@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" 
+				xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+				xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" 
+				layout:decorate="~{layout/layout}">
+
+<th:block layout:fragment="content">
+    
+    <div class="sns-container">
+        
+        <div class="profile-wrapper">
+		    <form method="POST" action="/join" enctype="multipart/form-data" id="profile-modify-form">
+	        	<div class="row">
+	        		<!-- 프로필 사진 수정 -->
+	        		<div class="col-5">
+	        			<div style="padding: 2vw;">
+							<img id="preview-profile-photo" style="height: 200px; width: 200px; border-radius: 50%;">
+	        			</div>
+	        			
+	           			<input type="file" accept=".jpg, .png" class="form-control" id="profileImageFile" name="profileImageFile">
+	           			<button type="button" id="file-reset" class="btn btn-warning">초기화</button>
+	           			
+	        		</div>
+	        		
+	        		<!-- 일반 정보 수정 폼 -->
+	        		<div class="col-7">
+	        			<h2>회원가입</h2>
+				        <div class="mb-3">
+				            <label for="email" class="form-label">이메일:</label>
+				            <input type="email" class="form-control" id="email" name="email" required="required" />
+				        </div>
+				        <div class="mb-3">
+				            <label for="name" class="form-label">비밀번호</label>
+				            <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호" required="required" />
+				            <input type="password" class="form-control" id="password-check" placeholder="비밀번호 확인" required="required" />
+				        </div>
+				        <div class="mb-3">
+				            <label for="name" class="form-label">이름:</label>
+				            <input type="text" class="form-control" id="name" name="name" required="required" />
+				        </div>
+				        <div class="mb-3">
+				            <label for="bio" class="form-label">소개:</label>
+				            <textarea class="form-control" id="bio" name="bio"></textarea>
+				        </div>
+				        <div class="mb-3">
+				            <button type="submit" class="btn btn-primary">가입</button>
+				        </div>
+	        		</div>
+	        	</div>
+		    </form>
+        </div>
+
+    </div>
+    
+    
+</th:block>
+<th:block layout:fragment="customScript">
+	<script th:inline="javascript">
+		$(document).ready(function () {
+			$("#profileImageFile").change(function() {
+				const file = this.files[0];
+		        if (file){
+					let reader = new FileReader();
+					reader.onload = function(event){
+						console.log(event.target.result);
+						$("#preview-profile-photo").attr("src",event.target.result);
+					}
+					reader.readAsDataURL(file);
+		        }
+			});
+			
+			$("#file-reset").click(function() {
+				$("#profileImageFile").val(null);
+				$("#preview-profile-photo").removeAttr("src",event.target.result);
+			})
+			
+		});
+	
+	</script>
+</th:block>
+    
+    
