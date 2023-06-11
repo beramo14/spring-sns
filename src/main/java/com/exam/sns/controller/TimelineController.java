@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,9 +27,10 @@ public class TimelineController {
 	
 	@Autowired
 	private MemberService memberService;
+	
 
     @GetMapping("/")
-    public String home(Model model, Principal principal) {
+    public String home(Model model, Principal principal) throws Exception {
     	if(principal != null) {
     		String loggedInUsername = principal.getName();
     		Member loggedInUser = memberService.getMemberByEmail(loggedInUsername);
@@ -44,7 +46,6 @@ public class TimelineController {
  
     @PostMapping("/posts/create")
     public String createPost(Post post) {
-    	
         postService.createPost(post);
         return "redirect:/";
     }

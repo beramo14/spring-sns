@@ -9,7 +9,7 @@
     <div class="sns-container">
         
         <div class="profile-wrapper">
-		    <form method="POST" action="/profile/save" enctype="multipart/form-data" id="profile-modify-form">
+		    <form method="POST" action="/profile" enctype="multipart/form-data" id="profile-modify-form">
 	        	<div class="row">
 	        		<!-- 프로필 사진 수정 -->
 	        		<div class="col-5">
@@ -17,11 +17,10 @@
 							<img id="preview-profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}" style="height: 200px; width: 200px; border-radius: 50%;">
 	        			</div>
 	        			
+						<input type="hidden" name="id" th:value="${loggedInUser.id}"/>
 						<input type="hidden" id="original-profilePhoto" th:value="${loggedInUser.profilePhoto}"/>
-						<input type="hidden" id="current-profilePhoto" th:value="${loggedInUser.profilePhoto}"/>
-						<input type="hidden" id="isFileUpdate" value=""/>
 						<label for="new-profileImage" class="form-label">프로필 사진:</label>
-	           			<input type="file" accept=".jpg, .png" class="form-control" id="new-profileImage" name="newProfileImage">
+	           			<input type="file" accept=".jpg, .png" class="form-control" id="new-profileImage" name="profileImageFile">
 	           			<button type="button" id="file-reset" class="btn btn-warning">초기화</button>
 	           			
 	        		</div>
@@ -30,12 +29,16 @@
 	        		<div class="col-7">
 	        			<h2>프로필 수정</h2>
 					        <div class="mb-3">
-					            <label for="name" class="form-label">이름:</label>
-					            <input type="text" class="form-control" id="name" name="name" th:value="${loggedInUser.name}">
+					            <label for="email" class="form-label">이메일:</label>
+					            <input type="email" class="form-control" th:value="${loggedInUser.email}" readonly>
 					        </div>
 					        <div class="mb-3">
-					            <label for="email" class="form-label">이메일:</label>
-					            <input type="email" class="form-control" id="email" name="email" th:value="${loggedInUser.email}">
+					            <label for="email" class="form-label">비밀번호:</label>
+					            <input type="email" class="form-control" th:value="" readonly>
+					        </div>
+					        <div class="mb-3">
+					            <label for="name" class="form-label">이름:</label>
+					            <input type="text" class="form-control" id="name" name="name" th:value="${loggedInUser.name}">
 					        </div>
 					        <div class="mb-3">
 					            <label for="bio" class="form-label">소개:</label>
@@ -72,7 +75,6 @@
 			$("#file-reset").click(function() {
 				let context = /*[[@{/profile/photo/}]]*/;
 				let orgImageName = $("#original-profilePhoto").val();
-				
 				
 				$("#preview-profile-photo").attr("src", context + orgImageName);
 			});

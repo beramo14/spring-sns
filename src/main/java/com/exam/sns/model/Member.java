@@ -9,14 +9,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Data;
 
 @Entity
 @Table(name = "members")
-//@Getter
-//@Setter
-//@ToString(exclude = {"campaignEntity", "adsEntities"})
 @Data
+@DynamicUpdate
 public class Member {
 
 	private static final long serialVersionUID = 1L;
@@ -31,7 +31,7 @@ public class Member {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, updatable = false, unique = true)
     private String email;
     
     private String bio;

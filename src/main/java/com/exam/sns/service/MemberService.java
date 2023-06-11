@@ -6,6 +6,8 @@ public interface MemberService {
 
 	void insertMember(Member member);
 
-	Member getMemberByEmail(String loggedInUsername);
+	Member getMemberByEmail(String loggedInUsername) throws Exception;
+
+	void updateMember(Member member) throws Exception;
 
 }

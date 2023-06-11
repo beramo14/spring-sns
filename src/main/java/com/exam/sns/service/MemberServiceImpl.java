@@ -20,21 +20,48 @@ public class MemberServiceImpl implements MemberService{
 	PasswordEncoder passwordEncoder;
 
 	@Override
+	public Member getMemberByEmail(String loggedInUsername) throws Exception {
+		Optional<Member> findMember = memberRepo.findByEmail(loggedInUsername);
+		
+		if(findMember.isPresent()) {
+			return findMember.get();
+		} else {
+			throw new Exception(loggedInUsername + " : EmailNotFound");
+		}
+		
+	}
+	
+	@Override
 	public void insertMember(Member member) {
 		member.setPassword(passwordEncoder.encode(member.getPassword()));
 		memberRepo.save(member);
 	}
 
 	@Override
-	public Member getMemberByEmail(String loggedInUsername) {
-		Optional<Member> findMember = memberRepo.findByEmail(loggedInUsername);
+	public void updateMember(Member member) throws Exception {
+		
+		Optional<Member> findMember = memberRepo.findById(member.getId());
 		
 		if(findMember.isPresent()) {
-			return findMember.get();
+			Member item =  findMember.get();
+			
+			if(member.getName() != null && member.getName().isBlank() == false) {
+				item.setName(member.getName());
+			}
+			if(member.getBio()  != null &&  member.getBio().isBlank() == false) {
+				item.setBio(member.getBio());
+			}
+			if(member.getProfilePhoto() != null && member.getProfilePhoto().isBlank() == false) {
+				item.setProfilePhoto(member.getProfilePhoto());
+			}
+			if(member.getPassword() != null && member.getPassword().isBlank() == false) {
+				item.setPassword(member.getPassword());
+			}
+			memberRepo.save(item);
 		} else {
-			throw new UsernameNotFoundException(loggedInUsername + " : x");
+			throw new Exception(member.getId() + " : UsernameNotFound");
 		}
-		
 	}
+	
 
 }

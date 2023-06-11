@@ -16,10 +16,8 @@
 	        			<div style="padding: 2vw;">
 							<img id="preview-profile-photo" style="height: 200px; width: 200px; border-radius: 50%;">
 	        			</div>
-	        			
 	           			<input type="file" accept=".jpg, .png" class="form-control" id="profileImageFile" name="profileImageFile">
 	           			<button type="button" id="file-reset" class="btn btn-warning">초기화</button>
-	           			
 	        		</div>
 	        		
 	        		<!-- 일반 정보 수정 폼 -->
@@ -59,9 +57,9 @@
 		$(document).ready(function () {
 			$("#profileImageFile").change(function() {
 				const file = this.files[0];
-		        if (file){
+		        if (file) {
 					let reader = new FileReader();
-					reader.onload = function(event){
+					reader.onload = function(event) {
 						console.log(event.target.result);
 						$("#preview-profile-photo").attr("src",event.target.result);
 					}
@@ -72,7 +70,15 @@
 			$("#file-reset").click(function() {
 				$("#profileImageFile").val(null);
 				$("#preview-profile-photo").removeAttr("src",event.target.result);
-			})
+			});
+			
+			$("#profile-modify-form").submit(function(event) {
+				if($("#password").val() != $("#password-check").val()) {
+					event.preventDefault();
+					alert("비밀번호를 다시 확인해주세요.");
+					$("#password-check").val("");
+				}
+			});
 			
 		});
 	
