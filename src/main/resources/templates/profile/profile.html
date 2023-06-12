@@ -17,7 +17,7 @@
 						<span class="name fs-3 fw-semibold" th:text="${member.name}">member.name</span>
 						<button class="btn btn-primary btn-sm" th:if="${member.id == loggedInUser.id}">프로필 수정</button>
 					</div>
-					<p>
+					<p th:text="${member.bio}">
 						Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
 						Vero dolorem eum suscipit modi iure quis ipsam, 
 						ipsum quod, enim illum obcaecati at.
