@@ -24,7 +24,7 @@ public class SecurityConfig{
         .and()
         .formLogin()
         .and()
-        .logout()
+        .logout().logoutSuccessUrl("/")
         .and()
         .csrf().disable();
         
