@@ -38,7 +38,7 @@
 					<div class="post-content">
 						<p th:text="${post.content}">post.contenttest</p>
 					</div>
-					<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">☆</button>
+					<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">♡</button>
 					<!-- 댓글 목록 -->
 					<ul class="comment-list">
 						<li class="comment-item" th:each="comment : ${post.comments}">
