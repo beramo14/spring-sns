@@ -33,7 +33,7 @@
 						 
 						<ul class="dropdown-menu" style="left: -140%;">
 							<li>
-							  	<a class="dropdown-item" href="/profile">프로필</a>
+							  	<a class="dropdown-item" th:href="@{/profile/{name}(name=${loggedInUser.name})}">프로필</a>
 						  	</li>
 							<li>
 							  	<a class="dropdown-item" href="/logout">로그아웃</a>

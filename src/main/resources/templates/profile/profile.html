@@ -8,25 +8,37 @@
     
     <div class="sns-container">
     	<div class="profile-wrapper">
-    		<div class="mb-3 d-flex align-items-center">
-					<div class="user-profile">
-						<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}" alt="Profile Image">
-					</div>
-					<span class="name" th:text="${loggedInUser.name}">loggedInUser.name</span>
+    		<div class="d-flex align-items-center">
+				<div class="user-profile">
+					<img class="profile-photo-large" th:src="@{/profile/photo/{filename}(filename=${member.profilePhoto})}" alt="Profile Image">
 				</div>
+				<div>
+					<div class="mb-2 d-flex" style="align-items:center; column-gap: 30px;">
+						<span class="name fs-3 fw-semibold" th:text="${member.name}">member.name</span>
+						<button class="btn btn-primary btn-sm" th:if="${member.id == loggedInUser.id}">프로필 수정</button>
+					</div>
+					<p>
+						Lorem ipsum, dolor sit amet consectetur adipisicing elit. 
+						Vero dolorem eum suscipit modi iure quis ipsam, 
+						ipsum quod, enim illum obcaecati at.
+					</p>
+				</div>
+			</div>
     	</div>
         
-        <!-- 포스트 작성 폼 -->
-		<div class="post-form" sec:authorize="isAuthenticated()">
-			<form action="/posts/create" method="post">
-				
-				<div class="mb-3">
-					<label for="content" class="form-label">Content:</label>
-					<textarea class="form-control" id="content" name="content" rows="3" placeholder="Enter your post"></textarea>
-				</div>
-				<button type="submit" class="btn btn-primary">작성</button>
-			</form>
-		</div>
+		<th:block th:if="${member.id == loggedInUser.id}">
+			<!-- 포스트 작성 폼 -->
+			<div class="post-form" sec:authorize="isAuthenticated()">
+				<form action="/posts/create" method="post">
+					
+					<div class="mb-3">
+						<label for="content" class="form-label">포스트 작성</label>
+						<textarea class="form-control" id="content" name="content" rows="3" placeholder="포스트 내용 작성..."></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">작성</button>
+				</form>
+			</div>
+		</th:block>
         
         <!-- 포스트 목록 -->
         <ul class="post-list">
@@ -36,7 +48,7 @@
 					<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
 				</div>
 				<p class="post-content" th:text="${post.content}">post.contenttest</p>
-				<button class="post-like-button">좋아요</button>
+				<button class="post-like-button" sec:authorize="isAuthenticated()">좋아요</button>
 	
 				<!-- 댓글 목록 -->
 				<ul class="comment-list">
@@ -65,7 +77,7 @@
 						<button type="submit" class="btn btn-primary">Comment</button>
 					</form>
 				</div>
-				<button class="toggle-comment-form-button btn btn-link">댓글 작성</button>
+				<button class="toggle-comment-form-button btn btn-link" sec:authorize="isAuthenticated()">댓글 작성</button>
 	
 			</li>
 		</ul>

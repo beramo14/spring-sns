@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,12 @@ public class PostServiceImpl implements PostService {
 	private MemberRepository memberRepo;
 
 	public List<Post> getAllPosts() {
-	    return postRepo.findAll();	    
+	    return postRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));	    
 	}
+
+    public List<Post> findByUserId(Long id) {
+        return postRepo.findByUserIdOrderByCreatedAtDesc(id);
+    }
 
     public void createPost(Post post) {
     	// 로그인한 사용자의 정보 가져오기

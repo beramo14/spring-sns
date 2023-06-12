@@ -15,4 +15,6 @@ public interface PostService {
 
 	void createComment(Long postId, Comment comment) throws NotFoundException;
 
+	List<Post> findByUserId(Long id);
+
 }

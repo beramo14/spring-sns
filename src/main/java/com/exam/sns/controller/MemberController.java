@@ -1,7 +1,9 @@
 package com.exam.sns.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -10,6 +12,7 @@ import javax.servlet.ServletException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,6 +52,7 @@ public class MemberController {
 	
 	
 	
+	
 	@GetMapping("/join")
 	public String joinForm(Model model) {
 		
@@ -80,7 +84,7 @@ public class MemberController {
 		return "redirect:";
 	}
 	
-	@GetMapping("/profile/{name}")
+	@GetMapping("/profile/@{name}")
 	public String profile(@PathVariable("name") String name, Model model, Principal principal) throws Exception {
 		if(principal != null) {
     		String loggedInUsername = principal.getName();
@@ -91,13 +95,15 @@ public class MemberController {
     	}
 		Member member = memberService.getMemberByName(name);
 		model.addAttribute("member", member);
+
+		List<Post> posts = postService.findByUserId(member.getId());
+        model.addAttribute("posts", posts);
 		
 		return "profile/profile";
 	}
 	
 	@GetMapping("/profile/edit")
 	public String profileForm(Model model, Principal principal) throws Exception {
-		
 		
 		if(principal != null) {
     		String loggedInUsername = principal.getName();
