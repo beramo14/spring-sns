@@ -10,4 +10,8 @@ public interface MemberService {
 
 	void updateMember(Member member) throws Exception;
 
+	void updatePassword(String newPassword, String name);
+
+	Member getMemberByName(String name) throws Exception;
+
 }

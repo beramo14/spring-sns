@@ -26,7 +26,7 @@ public class MemberServiceImpl implements MemberService{
 		if(findMember.isPresent()) {
 			return findMember.get();
 		} else {
-			throw new Exception(loggedInUsername + " : EmailNotFound");
+			throw new UsernameNotFoundException(loggedInUsername + " : EmailNotFound");
 		}
 		
 	}
@@ -59,8 +59,26 @@ public class MemberServiceImpl implements MemberService{
 			}
 			memberRepo.save(item);
 		} else {
-			throw new Exception(member.getId() + " : UsernameNotFound");
+			throw new Exception(member.getId() + " : MemberNotFound");
 		}
+	}
+
+	@Override
+	public void updatePassword(String newPassword, String name) {
+		memberRepo.updatePassword(name, passwordEncoder.encode(newPassword));
+		
+	}
+
+	@Override
+	public Member getMemberByName(String name) throws Exception {
+		Optional<Member> findMember = memberRepo.findByName(name);
+		if(findMember.isPresent()) {
+			return findMember.get();
+		} else {
+			throw new Exception(name + " : MemberNotFound");
+		}
+		
+		
 	}
 	
 

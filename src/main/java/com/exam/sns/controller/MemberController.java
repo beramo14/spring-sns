@@ -44,6 +44,9 @@ public class MemberController {
 	@Value("${file.root}")
 	private String fileRootDir;
 	
+	@Value("${file.profile.default-file-name}")
+	private String defaultProfileFileName;
+	
 	
 	
 	@GetMapping("/join")
@@ -68,6 +71,8 @@ public class MemberController {
     		
     		System.out.println("final file Name = " + fileName);
     		file.transferTo(new File(fileRootDir+"/profile/"+fileName));
+		} else {
+			member.setProfilePhoto(defaultProfileFileName);
 		}
 		/*참고 : https://velog.io/@songs4805/Spring-MVC-%ED%8C%8C%EC%9D%BC-%EC%97%85%EB%A1%9C%EB%93%9C*/
 		memberService.insertMember(member);
@@ -75,21 +80,38 @@ public class MemberController {
 		return "redirect:";
 	}
 	
-	@GetMapping("/profile")
+	@GetMapping("/profile/{name}")
+	public String profile(@PathVariable("name") String name, Model model, Principal principal) throws Exception {
+		if(principal != null) {
+    		String loggedInUsername = principal.getName();
+    		Member loggedInUser = memberService.getMemberByEmail(loggedInUsername);
+    		model.addAttribute("loggedInUser", loggedInUser);
+    	} else {
+    		model.addAttribute("loggedInUser", new Member());
+    	}
+		Member member = memberService.getMemberByName(name);
+		model.addAttribute("member", member);
+		
+		return "profile/profile";
+	}
+	
+	@GetMapping("/profile/edit")
 	public String profileForm(Model model, Principal principal) throws Exception {
+		
+		
 		if(principal != null) {
     		String loggedInUsername = principal.getName();
     		Member loggedInUser = memberService.getMemberByEmail(loggedInUsername);
     		model.addAttribute("loggedInUser", loggedInUser);
     		
-    		return "profile";
+    		return "profile/edit";
     	} else {
     		return "redirect:login";
     	}
 	}
 
-	@PostMapping("/profile")
-	public String profile(Member member, @RequestParam("profileImageFile") MultipartFile file, Model model, Principal principal) throws Exception {
+	@PostMapping("/profile/edit")
+	public String profileEdit(Member member, @RequestParam("profileImageFile") MultipartFile file, Model model, Principal principal) throws Exception {
 		
 		System.out.println(member);
 		
@@ -106,6 +128,15 @@ public class MemberController {
 		memberService.updateMember(member);
 		
 		return "redirect:profile";
+	}
+	
+	@PostMapping("/profile/edit/password")
+	@ResponseBody
+	public String profileEditPassword(@RequestParam("newPassword") String newPassword, Principal principal) {
+		
+		memberService.updatePassword(newPassword, principal.getName());
+		
+		return "success";
 	}
 	
 	@ResponseBody

@@ -9,7 +9,7 @@
     <div class="sns-container">
         
         <div class="profile-wrapper">
-		    <form method="POST" action="/profile" enctype="multipart/form-data" id="profile-modify-form">
+		    <form method="POST" action="/profile/edit" enctype="multipart/form-data" id="profile-modify-form">
 	        	<div class="row">
 	        		<!-- 프로필 사진 수정 -->
 	        		<div class="col-5">
@@ -30,11 +30,10 @@
 	        			<h2>프로필 수정</h2>
 					        <div class="mb-3">
 					            <label for="email" class="form-label">이메일:</label>
-					            <input type="email" class="form-control" th:value="${loggedInUser.email}" readonly>
+					            <input type="email" class="form-control" th:value="${loggedInUser.email}" disabled>
 					        </div>
 					        <div class="mb-3">
-					            <label for="email" class="form-label">비밀번호:</label>
-					            <input type="email" class="form-control" th:value="" readonly>
+					            <button type="button" id="change-password-button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#password-modal">비밀번호 변경</button>
 					        </div>
 					        <div class="mb-3">
 					            <label for="name" class="form-label">이름:</label>
@@ -54,11 +53,38 @@
 
     </div>
     
+	<div id="password-modal" class="modal fade" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<form id="edit-password">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">비밀번호 변경</h1>
+		        		<button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+					</div>
+					<div class="modal-body">
+						<div class="mb-3">
+				            <label for="name" class="form-label">변경 비밀번호:</label>
+				            <input type="password" class="form-control" id="new-password" name="newPassword">
+				        </div>
+						<div class="mb-3">
+				            <label for="name" class="form-label">변경 비밀번호 확인:</label>
+				            <input type="password" class="form-control" id="new-password-confirm">
+				        </div>
+					</div>
+					<div class="modal-footer">
+						<button type="reset" id="password-modal-close" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+						<button type="submit" class="btn btn-primary">변경</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
     
 </th:block>
 <th:block layout:fragment="customScript">
 	<script th:inline="javascript">
 		$(document).ready(function () {
+			
 			$("#new-profileImage").change(function() {
 				const file = this.files[0];
 		        if (file){
@@ -79,6 +105,35 @@
 				$("#preview-profile-photo").attr("src", context + orgImageName);
 			});
 			/*]]>*/
+			
+			$("#edit-password").submit(function(event) {
+				event.preventDefault();
+				
+				if($("#new-password").val() == $("#new-password-confirm").val()) {
+					let thisForm = this;
+					let formData = $(this).serialize();
+					
+					$.ajax({
+						type: "post",
+						url: '/profile/edit/password',
+						data: formData,
+						processData: false,
+						success: function (response) {
+							console.log(response);
+							alert("비밀번호가 변경되었습니다.")
+							thisForm.reset();
+							$("#password-modal-close").click();
+						},
+						error: function (error) {
+							console.log(error);
+							thisForm.reset();
+						}
+					});
+				} else {
+					alert("비밀번호를 다시 확인해주세요.");
+				}
+				
+			});
 			
 		});
 	
