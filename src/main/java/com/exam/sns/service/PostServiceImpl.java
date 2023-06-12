@@ -1,7 +1,6 @@
 package com.exam.sns.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -9,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.exam.sns.model.Comment;
 import com.exam.sns.model.Member;
@@ -71,5 +71,13 @@ public class PostServiceImpl implements PostService {
     	
     	
     }
+
+	@Override
+	@Transactional
+	public void deletePost(Long id) {
+//		postRepo.deleteById(id);
+		Post post = postRepo.findById(id).get(); 
+		postRepo.delete(post);
+	}
 
 }

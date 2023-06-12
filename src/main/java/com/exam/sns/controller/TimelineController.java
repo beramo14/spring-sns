@@ -56,4 +56,12 @@ public class TimelineController {
         return "redirect:/";
     }
     
+    @GetMapping("/post/delete/{id}")
+    public String deletePost(@PathVariable("id") Long id) {
+    	System.out.println("#############id = "+id);
+    	postService.deletePost(id);
+    	
+    	return "redirect:/";
+    }
+    
 }

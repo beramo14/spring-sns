@@ -17,4 +17,6 @@ public interface PostService {
 
 	List<Post> findByUserId(Long id);
 
+	void deletePost(Long id);
+
 }

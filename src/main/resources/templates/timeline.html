@@ -28,11 +28,23 @@
         <!-- 포스트 목록 -->
         <ul class="post-list">
 			<li class="post-item" th:each="post : ${posts}">
-				<div class="user-profile">
-					<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
-					<h5 class="post-name">
-						<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${post.user.name}">post.user.nametest</a>
-					</h5>
+				<div class="user-profile-post">
+					<div>
+						<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
+						<h5 class="post-name">
+							<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${post.user.name}">post.user.nametest</a>
+						</h5>
+					</div>
+					<div>
+						<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-mm-dd HH:mm')}"></span>
+						<th:block th:if="${post.user.id == loggedInUser.id}">
+							<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
+							<ul class="dropdown-menu">
+								<li><button id="post-modify-button" class="dropdown-item">수정</button></li>
+								<li><a class="dropdown-item" th:href="@{/post/delete/{id}(id=${post.id})}">삭제</a></li>
+							</ul>
+						</th:block>
+					</div>
 				</div>
 				<div class="post-content-wrapper">
 					<div class="post-content">
@@ -42,14 +54,25 @@
 					<!-- 댓글 목록 -->
 					<ul class="comment-list">
 						<li class="comment-item" th:each="comment : ${post.comments}">
-							<div class="user-profile">
-								<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
-								
-								<p class="comment-name">
-									<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${comment.user.name}">
-										comment.user.nametest
-									</a>
-								</p>
+							<div class="user-profile-comment">
+								<div>
+									<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
+									<p class="comment-name">
+										<a th:href="@{/profile/@{name}(name=${comment.user.name})}" th:text="${comment.user.name}">
+											comment.user.nametest
+										</a>
+									</p>
+								</div>
+								<div>
+									<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-mm-dd HH:mm')}"></span>
+									<th:block th:if="${comment.user.id == loggedInUser.id}">
+										<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
+										<ul class="dropdown-menu">
+											<li><button id="comment-modify-button" class="dropdown-item">수정</button></li>
+											<li><a class="dropdown-item" th:href="@{/comment/delete/{id}(id=${post.id})}">삭제</a></li>
+										</ul>
+									</th:block>
+								</div>
 							</div>
 							<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
 						</li>
@@ -72,7 +95,32 @@
 					<button class="toggle-comment-form-button btn btn-link" sec:authorize="isAuthenticated()">댓글 작성</button>
 				</div>
 	
-	
+				<div id="post-modify-modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<form id="edit-password">
+								<div class="modal-header">
+									<h1 class="modal-title fs-5">비밀번호 변경</h1>
+					        		<button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+								</div>
+								<div class="modal-body">
+									<div class="mb-3">
+							            <label for="name" class="form-label">변경 비밀번호:</label>
+							            <input type="password" class="form-control" id="new-password" name="newPassword">
+							        </div>
+									<div class="mb-3">
+							            <label for="name" class="form-label">변경 비밀번호 확인:</label>
+							            <input type="password" class="form-control" id="new-password-confirm">
+							        </div>
+								</div>
+								<div class="modal-footer">
+									<button type="reset" id="password-modal-close" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+									<button type="submit" class="btn btn-primary">변경</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
 	
 			</li>
 		</ul>
@@ -117,7 +165,10 @@
                     $(this).text('댓글 작성');
                 }
             });
-
+	
+            $("#post-modify-button").click(function(event) {
+            	
+            });
 
         });
     </script>

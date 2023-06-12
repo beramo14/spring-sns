@@ -15,7 +15,7 @@
 				<div>
 					<div class="mb-2 d-flex" style="align-items:center; column-gap: 30px;">
 						<span class="name fs-3 fw-semibold" th:text="${member.name}">member.name</span>
-						<button class="btn btn-primary btn-sm" th:if="${member.id == loggedInUser.id}">프로필 수정</button>
+						<a class="btn btn-primary btn-sm" th:if="${member.id == loggedInUser.id}" th:href="@{/profile/edit}">프로필 수정</a>
 					</div>
 					<p th:text="${member.bio}">
 						Lorem ipsum, dolor sit amet consectetur adipisicing elit. 

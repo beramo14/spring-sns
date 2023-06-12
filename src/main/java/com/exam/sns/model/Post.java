@@ -41,7 +41,7 @@ public class Post {
     private LocalDateTime createdAt;
     
     @JsonManagedReference
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval=true)
     private List<Comment> comments = new ArrayList<>();
 
     public List<Comment> getComments() {
