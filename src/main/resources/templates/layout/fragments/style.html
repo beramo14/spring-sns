@@ -39,12 +39,9 @@
 
         .post-like-button {
             display: inline-block;
-            padding: 5px 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            font-weight: 900;
+
+            border-radius: 50%;
         }
 
         /* 추가적인 스타일링 */
@@ -99,11 +96,13 @@
             margin-right: 10px;
         }
 
-        .post-name, .comment-name {
+        .post-name > a, .post-name, .comment-name > a, .comment-name {
             display: inline-block;
             margin: 0;
             vertical-align: middle;
             font-weight: bold;
+            text-decoration: none;
+            color: black;
         }
         
         .comment-list {

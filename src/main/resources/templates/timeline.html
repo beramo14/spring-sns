@@ -30,19 +30,26 @@
 			<li class="post-item" th:each="post : ${posts}">
 				<div class="user-profile">
 					<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
-					<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
+					<h5 class="post-name">
+						<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${post.user.name}">post.user.nametest</a>
+					</h5>
 				</div>
 				<div class="post-content-wrapper">
 					<div class="post-content">
 						<p th:text="${post.content}">post.contenttest</p>
 					</div>
-					<button class="post-like-button" sec:authorize="isAuthenticated()">좋아요</button>
+					<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">☆</button>
 					<!-- 댓글 목록 -->
 					<ul class="comment-list">
 						<li class="comment-item" th:each="comment : ${post.comments}">
 							<div class="user-profile">
 								<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
-								<p class="comment-name" th:text="${comment.user.name}">comment.user.nametest</p>
+								
+								<p class="comment-name">
+									<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${comment.user.name}">
+										comment.user.nametest
+									</a>
+								</p>
 							</div>
 							<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
 						</li>
@@ -54,7 +61,7 @@
 								<div class="user-profile">
 									<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}">
 								</div>
-								<div class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</div>
+								<span class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</span>
 							</div>
 							<div class="mb-1">
 								<textarea class="form-control" id="comment-content" name="content" rows="2" placeholder="댓글 내용 입력..."></textarea>
@@ -110,6 +117,8 @@
                     $(this).text('댓글 작성');
                 }
             });
+
+
         });
     </script>
 </th:block>
