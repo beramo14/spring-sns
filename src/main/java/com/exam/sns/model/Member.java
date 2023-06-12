@@ -1,15 +1,22 @@
 package com.exam.sns.model;
 
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Data;
 
@@ -28,7 +35,7 @@ public class Member {
 	@Column(nullable = false)
 	private String password;
 	
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String name;
 
     @Column(nullable = false, updatable = false, unique = true)
@@ -41,5 +48,9 @@ public class Member {
     @Enumerated(EnumType.STRING)
     @Column(insertable = false, updatable = false, columnDefinition = "varchar(12) DEFAULT 'ROLE_USER'")
     private Role role;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Post> posts;
   
 }
