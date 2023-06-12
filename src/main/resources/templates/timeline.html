@@ -18,8 +18,8 @@
 					<span class="name" th:text="${loggedInUser.name}">loggedInUser.name</span>
 				</div>
 				<div class="mb-3">
-					<label for="content" class="form-label">Content:</label>
-					<textarea class="form-control" id="content" name="content" rows="3" placeholder="Enter your post"></textarea>
+					<label for="content" class="form-label">포스트 작성</label>
+					<textarea class="form-control" id="content" name="content" rows="3" placeholder="포스트 내용 작성..."></textarea>
 				</div>
 				<button type="submit" class="btn btn-primary">작성</button>
 			</form>
@@ -32,37 +32,40 @@
 					<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
 					<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
 				</div>
-				<p class="post-content" th:text="${post.content}">post.contenttest</p>
-				<button class="post-like-button">좋아요</button>
-	
-				<!-- 댓글 목록 -->
-				<ul class="comment-list">
-					<li class="comment-item" th:each="comment : ${post.comments}">
-						<div class="user-profile">
-							<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
-							<p class="comment-name" th:text="${comment.user.name}">comment.user.nametest</p>
-						</div>
-						<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
-					</li>
-				</ul>
-	
-				<!-- 댓글 작성 폼 -->
-				<div class="comment-form" sec:authorize="isAuthenticated()" style="display: none;">
-					<form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
-						<div class="mb-3 d-flex align-items-center">
+				<div class="post-content-wrapper">
+					<div class="post-content">
+						<p th:text="${post.content}">post.contenttest</p>
+					</div>
+					<button class="post-like-button" sec:authorize="isAuthenticated()">좋아요</button>
+					<!-- 댓글 목록 -->
+					<ul class="comment-list">
+						<li class="comment-item" th:each="comment : ${post.comments}">
 							<div class="user-profile">
-								<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}">
+								<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
+								<p class="comment-name" th:text="${comment.user.name}">comment.user.nametest</p>
 							</div>
-							<div class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</div>
-						</div>
-						<div class="mb-3">
-							<label for="comment-content" class="form-label">Content:</label>
-							<textarea class="form-control" id="comment-content" name="content" rows="3" placeholder="Enter your comment"></textarea>
-						</div>
-						<button type="submit" class="btn btn-primary">Comment</button>
-					</form>
+							<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
+						</li>
+					</ul>
+					<!-- 댓글 작성 폼 -->
+					<div class="comment-form" sec:authorize="isAuthenticated()" style="display: none;">
+						<form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
+							<div class="mb-1 d-flex align-items-center">
+								<div class="user-profile">
+									<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}">
+								</div>
+								<div class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</div>
+							</div>
+							<div class="mb-1">
+								<textarea class="form-control" id="comment-content" name="content" rows="2" placeholder="댓글 내용 입력..."></textarea>
+							</div>
+							<button type="submit" class="btn btn-primary">작성</button>
+						</form>
+					</div>
+					<button class="toggle-comment-form-button btn btn-link" sec:authorize="isAuthenticated()">댓글 작성</button>
 				</div>
-				<button class="toggle-comment-form-button btn btn-link">댓글 작성</button>
+	
+	
 	
 			</li>
 		</ul>
