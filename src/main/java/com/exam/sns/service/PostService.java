@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.exam.sns.model.Comment;
+import com.exam.sns.model.Member;
 import com.exam.sns.model.Post;
 
 public interface PostService {
@@ -18,5 +19,7 @@ public interface PostService {
 	List<Post> findByUserId(Long id);
 
 	void deletePost(Long id);
+
+	Post findById(Long id);
 
 }

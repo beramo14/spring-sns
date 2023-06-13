@@ -25,9 +25,12 @@
 			</form>
 		</div>
         
+        
         <!-- 포스트 목록 -->
         <ul class="post-list">
+        
 			<li class="post-item" th:each="post : ${posts}">
+				
 				<div class="user-profile-post">
 					<div>
 						<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
@@ -36,7 +39,7 @@
 						</h5>
 					</div>
 					<div>
-						<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-mm-dd HH:mm')}"></span>
+						<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></span>
 						<th:block th:if="${post.user.id == loggedInUser.id}">
 							<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
 							<ul class="dropdown-menu">
@@ -46,11 +49,19 @@
 						</th:block>
 					</div>
 				</div>
+				
 				<div class="post-content-wrapper">
+				
+					<!-- 포스트 내용 -->
 					<div class="post-content">
 						<p th:text="${post.content}">post.contenttest</p>
 					</div>
-					<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">♡</button>
+					<div class="d-flex" style="column-gap:10px;">
+						<button class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()" th:post-target="${post.id}">좋아요</button>
+						<div class="post-like-members" th:post-target="${post.id}"></div>
+					</div>
+					
+					
 					<!-- 댓글 목록 -->
 					<ul class="comment-list">
 						<li class="comment-item" th:each="comment : ${post.comments}">
@@ -64,7 +75,7 @@
 									</p>
 								</div>
 								<div>
-									<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-mm-dd HH:mm')}"></span>
+									<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></span>
 									<th:block th:if="${comment.user.id == loggedInUser.id}">
 										<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
 										<ul class="dropdown-menu">
@@ -132,8 +143,26 @@
     <script>
         // jQuery 코드 추가
         $(document).ready(function () {
+
+        	postLikeMembers();
+        	
+        	
             $('.post-like-button').click(function () {
                 $(this).toggleClass('liked');
+				let postId = $(this).attr("post-target");
+				console.log("post like target = " + postId);
+				$.ajax({
+					type : "get",
+					url : "/post/like/"+postId,
+					data:{like: $(this).hasClass("liked")},
+					success: function(response) {
+						console.log(postId + " post liked");
+					},
+					error: function(error) {
+						console.error(error);
+		                $(this).toggleClass('liked');
+					}
+				});
             });
             
             $('.toggle-comment-list-button').click(function () {
@@ -165,11 +194,31 @@
                     $(this).text('댓글 작성');
                 }
             });
-	
-            $("#post-modify-button").click(function(event) {
-            	
-            });
 
         });
+        
+        function postLikeMembers() {
+        	$(".post-like-members").each( function(index, item) {
+        		
+	           	let postId = $(item).attr("post-target")
+	           	$.ajax({
+					type : "get",
+					url : "/post/like/"+postId+"/get",
+					success: function(response) {
+						console.log(postId)
+						console.log(response);
+						
+						$.each(response, function(index, row) {
+							console.log(row);
+							$(item).append("<a href='/profile/@"+row.userName+"'>"+"<img class='profile-photo-like' src='/profile/photo/"+row.userProfilePhoto+"'"+"</a>");
+						});
+					},
+					error: function(error) {
+						console.error(error);
+					}
+				});
+        	});
+        	
+        }
     </script>
 </th:block>

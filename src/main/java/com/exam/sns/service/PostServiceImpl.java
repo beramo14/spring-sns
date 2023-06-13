@@ -1,6 +1,7 @@
 package com.exam.sns.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
@@ -11,9 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.exam.sns.model.Comment;
+import com.exam.sns.model.Like;
+import com.exam.sns.model.LikeType;
 import com.exam.sns.model.Member;
 import com.exam.sns.model.Post;
 import com.exam.sns.repository.CommentRepository;
+import com.exam.sns.repository.LikeRepository;
 import com.exam.sns.repository.MemberRepository;
 import com.exam.sns.repository.PostRepository;
 
@@ -28,6 +32,8 @@ public class PostServiceImpl implements PostService {
 	
 	@Autowired
 	private MemberRepository memberRepo;
+	
+	
 
 	public List<Post> getAllPosts() {
 	    return postRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));	    
@@ -36,6 +42,12 @@ public class PostServiceImpl implements PostService {
     public List<Post> findByUserId(Long id) {
         return postRepo.findByUserIdOrderByCreatedAtDesc(id);
     }
+    
+	@Override
+	public Post findById(Long id) {
+		Optional<Post> findPost = postRepo.findById(id);
+		return findPost.get(); 
+	}
 
     public void createPost(Post post) {
     	// 로그인한 사용자의 정보 가져오기
@@ -79,5 +91,7 @@ public class PostServiceImpl implements PostService {
 		Post post = postRepo.findById(id).get(); 
 		postRepo.delete(post);
 	}
+
+	
 
 }

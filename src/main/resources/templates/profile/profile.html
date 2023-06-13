@@ -48,7 +48,7 @@
 					<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
 				</div>
 				<p class="post-content" th:text="${post.content}">post.contenttest</p>
-				<button class="post-like-button" sec:authorize="isAuthenticated()">좋아요</button>
+				<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">좋아요</button>
 	
 				<!-- 댓글 목록 -->
 				<ul class="comment-list">
