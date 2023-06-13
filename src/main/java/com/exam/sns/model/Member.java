@@ -19,6 +19,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Table(name = "members")
@@ -49,8 +50,14 @@ public class Member {
     @Column(insertable = false, updatable = false, columnDefinition = "varchar(12) DEFAULT 'ROLE_USER'")
     private Role role;
 
+    @ToString.Exclude
     @JsonManagedReference
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Post> posts;
+    
+//    @ToString.Exclude
+//    @JsonManagedReference
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    private List<Like> Likes;
   
 }
