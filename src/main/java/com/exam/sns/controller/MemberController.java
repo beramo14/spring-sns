@@ -145,8 +145,8 @@ public class MemberController {
 		return "success";
 	}
 	
-	@ResponseBody
 	@GetMapping("/test2")
+	@ResponseBody
 	public ResponseEntity<List<Post>> getPosts2() {
 		List<Post> posts = postService.getAllPosts();
 	    if (posts.isEmpty()) {
@@ -155,12 +155,14 @@ public class MemberController {
 	    return new ResponseEntity<>(posts, HttpStatus.OK);
 	}
 	
-	@ResponseBody
 	@GetMapping("/profile/photo/{imageName}")
+	@ResponseBody
 	public ResponseEntity<Resource> getProfileImage(@PathVariable("imageName") String imageName) throws Exception {
 		File file = fileUtil.getProfileImageFile(imageName);
 		Resource imageResource = fileUtil.getImageResource(file);
 		
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageResource);
 	}
+
+	
 }
