@@ -2,7 +2,6 @@ package com.exam.sns.controller;
 
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +22,7 @@ import com.exam.sns.model.Comment;
 import com.exam.sns.model.Like;
 import com.exam.sns.model.Member;
 import com.exam.sns.model.Post;
+import com.exam.sns.service.CommentService;
 import com.exam.sns.service.LikeService;
 import com.exam.sns.service.MemberService;
 import com.exam.sns.service.PostService;
@@ -32,6 +32,9 @@ public class TimelineController {
 
 	@Autowired
     private PostService postService;
+	
+	@Autowired
+	private CommentService commentService;
 	
 	@Autowired
 	private MemberService memberService;
@@ -65,6 +68,25 @@ public class TimelineController {
     public String createComment(@PathVariable("postId") Long postId, @ModelAttribute("comment") Comment comment) throws NotFoundException {
         postService.createComment(postId, comment);
         return "redirect:/";
+    }
+    
+    @PostMapping("/post/modify")
+    public ResponseEntity<String> postModify(Post post) {
+    	
+    	Post findPost = postService.findById(post.getId());
+    	findPost.setContent(post.getContent());
+    	postService.updatePost(findPost);
+    	
+    	return new ResponseEntity<String>("success", HttpStatus.OK);
+    }
+    
+    @PostMapping("/comment/modify")
+    public ResponseEntity<?> commentModify(Comment comment) {
+    	
+    	Comment findComment = commentService.findById(comment.getId());
+    	findComment.setContent(comment.getContent());
+    	commentService.updateComment(findComment);
+    	return new ResponseEntity<String>("success", HttpStatus.OK);
     }
     
     @GetMapping("/post/delete/{id}")

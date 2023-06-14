@@ -22,4 +22,6 @@ public interface PostService {
 
 	Post findById(Long id);
 
+	void updatePost(Post findPost);
+
 }

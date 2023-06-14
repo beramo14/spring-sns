@@ -43,44 +43,110 @@
         <!-- 포스트 목록 -->
         <ul class="post-list">
 			<li class="post-item" th:each="post : ${posts}">
-				<div class="user-profile">
-					<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
-					<h5 class="post-name" th:text="${post.user.name}">post.user.nametest</h5>
+				<div class="user-profile-post">
+					<div>
+						<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
+						<h5 class="post-name">
+							<a th:href="@{/profile/@{name}(name=${post.user.name})}" th:text="${post.user.name}">post.user.nametest</a>
+						</h5>
+					</div>
+					<div>
+						<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></span>
+						<th:block th:if="${post.user.id == loggedInUser.id}">
+							<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
+							<ul class="dropdown-menu">
+								<li><button class="dropdown-item modify-button" data-modify-type="post" th:data-modify-target="${post.id}">수정</button></li>
+								<li><a class="dropdown-item" th:href="@{/post/delete/{id}(id=${post.id})}">삭제</a></li>
+							</ul>
+						</th:block>
+					</div>
 				</div>
-				<p class="post-content" th:text="${post.content}">post.contenttest</p>
-				<button id="post-like" class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()">좋아요</button>
+				<div class="post-content-wrapper">
+					<!-- 포스트 내용 -->
+					<div class="post-content">
+						<p class="post-content" th:text="${post.content}" th:data-id="${'post-'+post.id}">post.contenttest</p>
+					</div>
+					<div class="d-flex" style="column-gap:10px;">
+						<button class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()" th:post-target="${post.id}">좋아요</button>
+						<div class="post-like-members" th:post-target="${post.id}"></div>
+					</div>
 	
-				<!-- 댓글 목록 -->
-				<ul class="comment-list">
-					<li class="comment-item" th:each="comment : ${post.comments}">
-						<div class="user-profile">
-							<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
-							<p class="comment-name" th:text="${comment.user.name}">comment.user.nametest</p>
-						</div>
-						<p class="comment-content" th:text="${comment.content}">comment.contenttest</p>
-					</li>
-				</ul>
 	
-				<!-- 댓글 작성 폼 -->
-				<div class="comment-form" sec:authorize="isAuthenticated()" style="display: none;">
-					<form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
-						<div class="mb-3 d-flex align-items-center">
-							<div class="user-profile">
-								<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}">
+					<!-- 댓글 목록 -->
+					<ul class="comment-list">
+						<li class="comment-item" th:each="comment : ${post.comments}">
+							<div class="user-profile-comment">
+								<div>
+									<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${comment.user.profilePhoto})}">
+									<p class="comment-name">
+										<a th:href="@{/profile/@{name}(name=${comment.user.name})}" th:text="${comment.user.name}">
+											comment.user.nametest
+										</a>
+									</p>
+								</div>
+								<div>
+									<span class="create-date" th:text="${#temporals.format(post.createdAt, 'yy-MM-dd HH:mm')}"></span>
+									<th:block th:if="${comment.user.id == loggedInUser.id}">
+										<a class="nav-link dropdown-toggle post-menu" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false">•••</a>
+										<ul class="dropdown-menu">
+											<li><button class="dropdown-item modify-button" data-modify-type="comment" th:data-modify-target="${comment.id}">수정</button></li>
+											<li><a class="dropdown-item" th:href="@{/comment/delete/{id}(id=${post.id})}">삭제</a></li>
+										</ul>
+									</th:block>
+								</div>
 							</div>
-							<div class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</div>
-						</div>
-						<div class="mb-3">
-							<label for="comment-content" class="form-label">Content:</label>
-							<textarea class="form-control" id="comment-content" name="content" rows="3" placeholder="Enter your comment"></textarea>
-						</div>
-						<button type="submit" class="btn btn-primary">Comment</button>
-					</form>
+							<p class="comment-content" th:text="${comment.content}" th:data-id="${'comment-'+comment.id}">comment.contenttest</p>
+						</li>
+					</ul>
+		
+					<!-- 댓글 작성 폼 -->
+					<div class="comment-form" sec:authorize="isAuthenticated()" style="display: none;">
+						<form th:action="@{/posts/{postId}/comments(postId=${post.id})}" method="post">
+							<div class="mb-1 d-flex align-items-center">
+								<div class="user-profile">
+									<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${loggedInUser.profilePhoto})}">
+								</div>
+								<span class="comment-name" th:text="${loggedInUser.name}">loggedInUser.name</span>
+							</div>
+							<div class="mb-1">
+								<textarea class="form-control" id="comment-content" name="content" rows="2" placeholder="댓글 내용 입력..."></textarea>
+							</div>
+							<button type="submit" class="btn btn-primary">작성</button>
+						</form>
+					</div>
+					<button class="toggle-comment-form-button btn btn-link" sec:authorize="isAuthenticated()">댓글 작성</button>
 				</div>
-				<button class="toggle-comment-form-button btn btn-link" sec:authorize="isAuthenticated()">댓글 작성</button>
-	
+				
+				
+				
+				
 			</li>
 		</ul>
+		
+		<div id="modify-modal" class="modal fade" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<form id="modify-form">
+								<input type="hidden" name="id"/>
+								<input type="hidden" id="modify-form-type"/>
+								<div class="modal-header">
+									<h1 class="modal-title fs-5">수정</h1>
+					        		<button type="reset" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+								</div>
+								<div class="modal-body">
+									<div class="mb-3">
+							            <label for="modify-content" class="form-label">내용 수정</label>
+										<textarea class="form-control" id="modify-content" name="content" rows="3" placeholder="포스트 내용 작성..."></textarea>
+							        </div>
+								</div>
+								<div class="modal-footer">
+									<button type="reset" id="modify-modal-close" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+									<button type="submit" class="btn btn-primary">수정</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
 
     </div>
 </th:block>
@@ -122,6 +188,68 @@
                     $(this).text('댓글 작성');
                 }
             });
+            
+            
+            $(".modify-button").click( function(){
+            	let type = $(this).attr("data-modify-type");
+            	let target = $(this).attr("data-modify-target");
+            	
+            	console.log("type : "+type);
+            	console.log("target : "+target);
+            	
+            	$("#modify-form > input[name='id']").val(target);
+            	$("#modify-form-type").val(type);
+            	
+    			if(type === "post") {
+    				$(".modal-title").text("포스트 수정");
+    				$("label[for='modify-content']").text("포스트 내용 수정");
+    				$("#modify-content").attr("placeholder","포스트 내용 작성...");
+    			} else if(type === "comment") {
+    				$(".modal-title").text("댓글 수정");
+    				$("label[for='modify-content']").text("댓글 내용 수정");
+    				$("#modify-content").attr("placeholder","댓글 내용 작성...");
+    			}
+    			
+    			let content = $("p[data-id='"+type+"-"+target+"']").text();
+    			$("#modify-content").text(content);
+    					
+            	
+            	const modifyModalElement = document.getElementById('modify-modal');
+            	const modifyModal = new bootstrap.Modal(modifyModalElement, {"focus" : true});
+            	modifyModal.show();
+            	
+            	modifyModalElement.addEventListener('hidden.bs.modal', () => {
+            		$("#modify-form > input[name='id']").val(null);
+                	$("#modify-form > input[name='type']").val(null);
+                	$("#modify-content").text(null);
+            	});
+            	
+            });
+            
+            $("#modify-form").submit(function(event) {
+            	event.preventDefault();
+            	let formData = $(this).serialize();
+            	let type = $("#modify-form-type").val();
+            	
+            	$.ajax({
+    				type: "post",
+    				url: '/'+type+'/modify',
+    				data: formData,
+    				processData: false,
+    				success: function (response) {
+    					console.log(response);
+    					alert("수정되었습니다.");
+    					$("#modify-modal-close").click();
+    					location.reload();
+    				},
+    				error: function (error) {
+    					console.log(error);
+    					alert("수정실패");
+    					$("#modify-modal-close").click();
+    				}
+    			});
+            });
+            
         });
     </script>
 </th:block>

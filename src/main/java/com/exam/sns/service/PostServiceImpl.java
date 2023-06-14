@@ -92,6 +92,12 @@ public class PostServiceImpl implements PostService {
 		postRepo.delete(post);
 	}
 
+	@Override
+	public void updatePost(Post findPost) {
+		
+		postRepo.save(findPost);
+	}
+
 	
 
 }
