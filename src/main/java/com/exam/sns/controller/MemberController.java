@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -121,7 +122,7 @@ public class MemberController {
 		
 		System.out.println(member);
 		
-		/* 파일 업로드 로직*/
+		/* 파일 업로드 로직 */
 		if (!file.isEmpty()) {
     		UUID uuid = UUID.randomUUID();
     		String fileName = uuid.toString()+"_"+file.getOriginalFilename();
@@ -133,7 +134,7 @@ public class MemberController {
 		
 		memberService.updateMember(member);
 		
-		return "redirect:profile";
+		return "redirect:/profile/@"+URLEncoder.encode(member.getName(),"UTF-8");
 	}
 	
 	@PostMapping("/profile/edit/password")
