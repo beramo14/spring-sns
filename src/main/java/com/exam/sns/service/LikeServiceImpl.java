@@ -54,4 +54,11 @@ public class LikeServiceImpl implements LikeService{
 		return findLike.isPresent();
 	}
 
+	@Override
+	public Like findByPostIdAndMemberId(Post post, Member member) throws Exception {
+		Optional<Like> findLike = likeRepo.findByUserIdAndPostId(member.getId(), post.getId());
+
+		return findLike.orElseThrow( () -> new Exception("좋아요를 찾을 수 없습니다.") );
+	}
+
 }

@@ -38,9 +38,29 @@ public class PostServiceImpl implements PostService {
 	public List<Post> getAllPosts() {
 	    return postRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));	    
 	}
+	@Override
+	public List<Post> getAllPosts(Member loggedInUser) {
+		List<Post> posts = postRepo.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
+		if(loggedInUser.getId() != null) {
+			for (Post post : posts) {
+				post.setLiked(post.getLikes().stream()
+						.anyMatch(like -> like.getUser().getId().equals(loggedInUser.getId())));
+			}
+		}
+		return posts; 
+	}
 
-    public List<Post> findByUserId(Long id) {
-        return postRepo.findByUserIdOrderByCreatedAtDesc(id);
+    public List<Post> findByUserId(Long id, Member loggedInUser) {
+       List<Post> posts = postRepo.findByUserIdOrderByCreatedAtDesc(id);
+       
+       if(loggedInUser.getId() != null) {
+			for (Post post : posts) {
+				post.setLiked(post.getLikes().stream()
+						.anyMatch(like -> like.getUser().getId().equals(loggedInUser.getId())));
+			}
+		}
+       
+       return posts;
     }
     
 	@Override
@@ -97,6 +117,8 @@ public class PostServiceImpl implements PostService {
 		
 		postRepo.save(findPost);
 	}
+
+	
 
 	
 

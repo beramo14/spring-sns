@@ -18,4 +18,6 @@ public interface LikeService {
 
 	boolean likeDuplicationCheck(Long userId, Long postId);
 
+	Like findByPostIdAndMemberId(Post post, Member member) throws Exception;
+
 }

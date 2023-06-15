@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.nio.file.NoSuchFileException;
 import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
@@ -87,17 +88,18 @@ public class MemberController {
 	
 	@GetMapping("/profile/@{name}")
 	public String profile(@PathVariable("name") String name, Model model, Principal principal) throws Exception {
+		Member loggedInUser = new Member();
+		
 		if(principal != null) {
     		String loggedInUsername = principal.getName();
-    		Member loggedInUser = memberService.getMemberByEmail(loggedInUsername);
-    		model.addAttribute("loggedInUser", loggedInUser);
-    	} else {
-    		model.addAttribute("loggedInUser", new Member());
-    	}
+    		loggedInUser = memberService.getMemberByEmail(loggedInUsername);
+    	} 
+		model.addAttribute("loggedInUser", loggedInUser);
+		
 		Member member = memberService.getMemberByName(name);
 		model.addAttribute("member", member);
 
-		List<Post> posts = postService.findByUserId(member.getId());
+		List<Post> posts = postService.findByUserId(member.getId(), loggedInUser);
         model.addAttribute("posts", posts);
 		
 		return "profile/profile";
@@ -164,6 +166,6 @@ public class MemberController {
 		
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageResource);
 	}
-
+	
 	
 }

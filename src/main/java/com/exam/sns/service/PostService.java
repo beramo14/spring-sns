@@ -10,13 +10,16 @@ import com.exam.sns.model.Post;
 
 public interface PostService {
 
+	
 	List<Post> getAllPosts();
+	List<Post> getAllPosts(Member loggedInUser);
 
+	List<Post> findByUserId(Long userId, Member loggedInUser);
+	
 	void createPost(Post post);
 
 	void createComment(Long postId, Comment comment) throws NotFoundException;
 
-	List<Post> findByUserId(Long id);
 
 	void deletePost(Long id);
 

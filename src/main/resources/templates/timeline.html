@@ -30,7 +30,6 @@
         <ul class="post-list">
         
 			<li class="post-item" th:each="post : ${posts}">
-				
 				<div class="user-profile-post">
 					<div>
 						<img class="profile-photo" th:src="@{/profile/photo/{filename}(filename=${post.user.profilePhoto})}">
@@ -56,8 +55,15 @@
 					<div class="post-content">
 						<p class="post-content" th:text="${post.content}" th:data-id="${'post-'+post.id}">post.contenttest</p>
 					</div>
-					<div class="d-flex" style="column-gap:10px;">
-						<button class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()" th:post-target="${post.id}">좋아요</button>
+					<div class="d-flex" style="column-gap:10px; align-items: center">
+						<!-- 좋아요 버튼 -->
+				        <button sec:authorize="isAuthenticated()" th:if="${post.liked}" th:id="${'post-'+post.id+'-button'}" class="btn btn-sm btn-outline-primary btn-liked" th:onclick="'unlikePost(' + ${post.id} + ')'" title="좋아요 취소">
+							<i class="bi bi-hand-thumbs-up-fill"></i>
+						</button>
+						<button sec:authorize="isAuthenticated()" th:unless="${post.liked}" th:id="${'post-'+post.id+'-button'}" class="btn btn-sm btn-outline-primary btn-like" th:onclick="'likePost(' + ${post.id} + ')'" title="좋아요">
+							<i class="bi bi-hand-thumbs-up"></i>
+						</button>
+ 
 						<div class="post-like-members" th:post-target="${post.id}"></div>
 					</div>
 					
@@ -139,30 +145,54 @@
     
 <th:block layout:fragment="customScript">
     <script>
+    
+    function likePost(postId) {
+        console.log('좋아요 버튼 클릭 - 포스트 ID:', postId);
+        $.ajax({
+			type : "get",
+			url : "/post/like/"+postId,
+			success: function(response) {
+				console.log(postId + " post liked");
+				postLikeMembers()
+                toggleLikeButton(postId, true);
+			},
+			error: function(error) {
+				console.error(error);
+			}
+		});
+    }
+
+    function unlikePost(postId) {
+        console.log('취소 버튼 클릭 - 포스트 ID:', postId);
+        $.ajax({
+			type : "get",
+			url : "/post/unlike/"+postId,
+			data:{like: $(this).hasClass("liked")},
+			success: function(response) {
+				console.log(postId + " post liked");
+				postLikeMembers()
+                toggleLikeButton(postId, false);
+			},
+			error: function(error) {
+				console.error(error);
+			}
+		});
+    }
+
+    function toggleLikeButton(postId, liked) {
+        const button = document.getElementById(`post-${postId}-button`);
+        if (button) {
+            button.innerHTML = liked ? '<i class="bi bi-hand-thumbs-up-fill"></i>' : '<i class="bi bi-hand-thumbs-up"></i>';
+            button.onclick = liked ? () => unlikePost(postId) : () => likePost(postId);
+            button.title = liked ? '좋아요 취소' : '좋아요 하기';
+        }
+    }
+    	
         // jQuery 코드 추가
         $(document).ready(function () {
 
         	postLikeMembers();
         	
-        	
-            $('.post-like-button').click(function () {
-                $(this).toggleClass('liked');
-				let postId = $(this).attr("post-target");
-				console.log("post like target = " + postId);
-				$.ajax({
-					type : "get",
-					url : "/post/like/"+postId,
-					data:{like: $(this).hasClass("liked")},
-					success: function(response) {
-						console.log(postId + " post liked");
-					},
-					error: function(error) {
-						console.error(error);
-		                $(this).toggleClass('liked');
-					}
-				});
-            });
-            
             $('.toggle-comment-list-button').click(function () {
                 var $commentList = $(this).siblings('.comment-list');
                 $commentList.toggle();
@@ -267,7 +297,7 @@
 					success: function(response) {
 						console.log(postId);
 						console.log(response);
-						
+						$(item).html(null);
 						$.each(response, function(index, row) {
 							console.log(row);
 							$(item).append("<a href='/profile/@"+row.userName+"'>"+"<img class='profile-photo-like' src='/profile/photo/"+row.userProfilePhoto+"'"+"</a>");

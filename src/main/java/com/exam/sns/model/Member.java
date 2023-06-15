@@ -55,9 +55,9 @@ public class Member {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Post> posts;
     
-//    @ToString.Exclude
-//    @JsonManagedReference
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-//    private List<Like> Likes;
+    @ToString.Exclude
+    @JsonManagedReference
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Like> Likes;
   
 }

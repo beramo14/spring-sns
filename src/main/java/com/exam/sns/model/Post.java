@@ -16,7 +16,9 @@ import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Data;
@@ -29,6 +31,7 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", nullable = false)
     private Member user;
@@ -47,4 +50,15 @@ public class Post {
     public List<Comment> getComments() {
         return comments;
     }
+    
+    @JsonManagedReference
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true)
+    private List<Like> likes = new ArrayList<>();
+    
+    public List<Like> getLikes() {
+    	return likes;
+    }
+    
+    @Transient
+    private boolean liked = false;
 }

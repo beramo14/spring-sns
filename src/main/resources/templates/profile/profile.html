@@ -66,8 +66,15 @@
 					<div class="post-content">
 						<p class="post-content" th:text="${post.content}" th:data-id="${'post-'+post.id}">post.contenttest</p>
 					</div>
-					<div class="d-flex" style="column-gap:10px;">
-						<button class="post-like-button btn btn-primary btn-sm" sec:authorize="isAuthenticated()" th:post-target="${post.id}">좋아요</button>
+					<div class="d-flex" style="column-gap:10px; align-items: center">
+						<!-- 좋아요 버튼 -->
+				        <button sec:authorize="isAuthenticated()" th:if="${post.liked}" th:id="${'post-'+post.id+'-button'}" class="btn btn-sm btn-outline-primary btn-liked" th:onclick="'unlikePost(' + ${post.id} + ')'" title="좋아요 취소">
+							<i class="bi bi-hand-thumbs-up-fill"></i>
+						</button>
+						<button sec:authorize="isAuthenticated()" th:unless="${post.liked}" th:id="${'post-'+post.id+'-button'}" class="btn btn-sm btn-outline-primary btn-like" th:onclick="'likePost(' + ${post.id} + ')'" title="좋아요">
+							<i class="bi bi-hand-thumbs-up"></i>
+						</button>
+ 
 						<div class="post-like-members" th:post-target="${post.id}"></div>
 					</div>
 	
@@ -118,8 +125,6 @@
 				</div>
 				
 				
-				
-				
 			</li>
 		</ul>
 		
@@ -152,12 +157,55 @@
 </th:block>
     
 <th:block layout:fragment="customScript">
-    <script>
+        <script>
+    
+    function likePost(postId) {
+        console.log('좋아요 버튼 클릭 - 포스트 ID:', postId);
+        $.ajax({
+			type : "get",
+			url : "/post/like/"+postId,
+			success: function(response) {
+				console.log(postId + " post liked");
+				postLikeMembers()
+                toggleLikeButton(postId, true);
+			},
+			error: function(error) {
+				console.error(error);
+			}
+		});
+    }
+
+    function unlikePost(postId) {
+        console.log('취소 버튼 클릭 - 포스트 ID:', postId);
+        $.ajax({
+			type : "get",
+			url : "/post/unlike/"+postId,
+			data:{like: $(this).hasClass("liked")},
+			success: function(response) {
+				console.log(postId + " post liked");
+				postLikeMembers()
+                toggleLikeButton(postId, false);
+			},
+			error: function(error) {
+				console.error(error);
+			}
+		});
+    }
+
+    function toggleLikeButton(postId, liked) {
+        const button = document.getElementById(`post-${postId}-button`);
+        if (button) {
+            button.innerHTML = liked ? '<i class="bi bi-hand-thumbs-up-fill"></i>' : '<i class="bi bi-hand-thumbs-up"></i>';
+            button.onclick = liked ? () => unlikePost(postId) : () => likePost(postId);
+            button.title = liked ? '좋아요 취소' : '좋아요 하기';
+        }
+    }
+    	
         // jQuery 코드 추가
         $(document).ready(function () {
-            $('.post-like-button').click(function () {
-                $(this).toggleClass('liked');
-            });
+
+        	postLikeMembers();
+        	
             
             $('.toggle-comment-list-button').click(function () {
                 var $commentList = $(this).siblings('.comment-list');
@@ -188,68 +236,93 @@
                     $(this).text('댓글 작성');
                 }
             });
-            
-            
-            $(".modify-button").click( function(){
-            	let type = $(this).attr("data-modify-type");
-            	let target = $(this).attr("data-modify-target");
-            	
-            	console.log("type : "+type);
-            	console.log("target : "+target);
-            	
-            	$("#modify-form > input[name='id']").val(target);
-            	$("#modify-form-type").val(type);
-            	
-    			if(type === "post") {
-    				$(".modal-title").text("포스트 수정");
-    				$("label[for='modify-content']").text("포스트 내용 수정");
-    				$("#modify-content").attr("placeholder","포스트 내용 작성...");
-    			} else if(type === "comment") {
-    				$(".modal-title").text("댓글 수정");
-    				$("label[for='modify-content']").text("댓글 내용 수정");
-    				$("#modify-content").attr("placeholder","댓글 내용 작성...");
-    			}
-    			
-    			let content = $("p[data-id='"+type+"-"+target+"']").text();
-    			$("#modify-content").text(content);
-    					
-            	
-            	const modifyModalElement = document.getElementById('modify-modal');
-            	const modifyModal = new bootstrap.Modal(modifyModalElement, {"focus" : true});
-            	modifyModal.show();
-            	
-            	modifyModalElement.addEventListener('hidden.bs.modal', () => {
-            		$("#modify-form > input[name='id']").val(null);
-                	$("#modify-form > input[name='type']").val(null);
-                	$("#modify-content").text(null);
-            	});
-            	
-            });
-            
-            $("#modify-form").submit(function(event) {
-            	event.preventDefault();
-            	let formData = $(this).serialize();
-            	let type = $("#modify-form-type").val();
-            	
-            	$.ajax({
-    				type: "post",
-    				url: '/'+type+'/modify',
-    				data: formData,
-    				processData: false,
-    				success: function (response) {
-    					console.log(response);
-    					alert("수정되었습니다.");
-    					$("#modify-modal-close").click();
-    					location.reload();
-    				},
-    				error: function (error) {
-    					console.log(error);
-    					alert("수정실패");
-    					$("#modify-modal-close").click();
-    				}
-    			});
-            });
-            
+
         });
+        
+        
+        $(".modify-button").click( function(){
+        	let type = $(this).attr("data-modify-type");
+        	let target = $(this).attr("data-modify-target");
+        	
+        	console.log("type : "+type);
+        	console.log("target : "+target);
+        	
+        	$("#modify-form > input[name='id']").val(target);
+        	$("#modify-form-type").val(type);
+        	
+			if(type === "post") {
+				$(".modal-title").text("포스트 수정");
+				$("label[for='modify-content']").text("포스트 내용 수정");
+				$("#modify-content").attr("placeholder","포스트 내용 작성...");
+			} else if(type === "comment") {
+				$(".modal-title").text("댓글 수정");
+				$("label[for='modify-content']").text("댓글 내용 수정");
+				$("#modify-content").attr("placeholder","댓글 내용 작성...");
+			}
+			
+			let content = $("p[data-id='"+type+"-"+target+"']").text();
+			$("#modify-content").text(content);
+					
+        	
+        	const modifyModalElement = document.getElementById('modify-modal');
+        	const modifyModal = new bootstrap.Modal(modifyModalElement, {"focus" : true});
+        	modifyModal.show();
+        	
+        	modifyModalElement.addEventListener('hidden.bs.modal', () => {
+        		$("#modify-form > input[name='id']").val(null);
+            	$("#modify-form > input[name='type']").val(null);
+            	$("#modify-content").text(null);
+        	});
+        	
+        });
+        
+        $("#modify-form").submit(function(event) {
+        	event.preventDefault();
+        	let formData = $(this).serialize();
+        	let type = $("#modify-form-type").val();
+        	
+        	$.ajax({
+				type: "post",
+				url: '/'+type+'/modify',
+				data: formData,
+				processData: false,
+				success: function (response) {
+					console.log(response);
+					alert("수정되었습니다.");
+					$("#modify-modal-close").click();
+					location.reload();
+				},
+				error: function (error) {
+					console.log(error);
+					alert("수정실패");
+					$("#modify-modal-close").click();
+				}
+			});
+        });
+        
+        
+        function postLikeMembers() {
+        	$(".post-like-members").each( function(index, item) {
+        		
+	           	let postId = $(item).attr("post-target")
+	           	$.ajax({
+					type : "get",
+					url : "/post/like/"+postId+"/get",
+					success: function(response) {
+						console.log(postId);
+						console.log(response);
+						$(item).html(null);
+						$.each(response, function(index, row) {
+							console.log(row);
+							$(item).append("<a href='/profile/@"+row.userName+"'>"+"<img class='profile-photo-like' src='/profile/photo/"+row.userProfilePhoto+"'"+"</a>");
+						});
+					},
+					error: function(error) {
+						console.error(error);
+					}
+				});
+        	});
+        	
+        }
     </script>
 </th:block>

@@ -45,15 +45,15 @@ public class TimelineController {
 
     @GetMapping("/")
     public String home(Model model, Principal principal) throws Exception {
+    	Member loggedInUser = new Member();
     	if(principal != null) {
     		String loggedInUsername = principal.getName();
-    		Member loggedInUser = memberService.getMemberByEmail(loggedInUsername);
-    		model.addAttribute("loggedInUser", loggedInUser);
-    	} else {
-    		model.addAttribute("loggedInUser", new Member());
+    		loggedInUser = memberService.getMemberByEmail(loggedInUsername);
     	}
     	
-        List<Post> posts = postService.getAllPosts();
+    	model.addAttribute("loggedInUser", loggedInUser);
+    	
+        List<Post> posts = postService.getAllPosts(loggedInUser);
         model.addAttribute("posts", posts);
         return "timeline";
     }
@@ -96,34 +96,38 @@ public class TimelineController {
     	
     	return "redirect:/";
     }
-
-    @GetMapping("/post/like/{id}")
+    
+    
+    @GetMapping("/post/like/{postId}")
     @ResponseBody
-    public ResponseEntity<?> likePost(@PathVariable("id") Long id, @RequestParam("like") boolean isLike, Principal principal) throws Exception {
+    public ResponseEntity<?> doPostLike(@PathVariable("postId") Long postId, Principal principal) throws Exception {
 
-        if(principal == null) {
-            return new ResponseEntity<String>("not logged", HttpStatus.BAD_REQUEST);
-    	}
-
-        System.out.println("id : "+id+", isLike : "+isLike);
-
-        Post post = postService.findById(id);
-        if(isLike == true) {
-        	Member member = memberService.getMemberByEmail(principal.getName());
-        	if(likeService.likeDuplicationCheck(member.getId(), id) == false) {
-        		likeService.addPostLike(post, member);
-        	} else {
-//        		return new ResponseEntity<String>("", HttpStatus.BAD_REQUEST);
-        	}
-        } else if(isLike == false) {
-        	Like findLike = likeService.findByPostId(post);
-        	likeService.deletePostLike(findLike);
-        }
-        
-        List<Like> likes = likeService.findAllLikes(id);
-        List<LikeDTO> likesToView = LikeDTO.convertToDTOList(likes);
-
-        return new ResponseEntity<List<LikeDTO>>(likesToView, HttpStatus.OK);
+    	/*로그인 확인*/
+		if(principal == null) {
+			return new ResponseEntity<String>("not logged", HttpStatus.BAD_REQUEST);
+		}
+		Post post = postService.findById(postId);
+		Member member = memberService.getMemberByEmail(principal.getName());
+		
+		likeService.addPostLike(post, member);
+    	
+    	return new ResponseEntity<String>("success", HttpStatus.OK);
+    }
+    
+    @GetMapping("/post/unlike/{postId}")
+    public ResponseEntity<?> doPostUnlike(@PathVariable("postId") Long postId, Principal principal) throws Exception {
+    	
+    	/*로그인 확인*/
+		if(principal == null) {
+			return new ResponseEntity<String>("not logged", HttpStatus.BAD_REQUEST);
+		}
+		Post post = postService.findById(postId);
+		Member member = memberService.getMemberByEmail(principal.getName());
+		
+		Like findLike = likeService.findByPostIdAndMemberId(post, member);
+		likeService.deletePostLike(findLike);
+		
+    	return new ResponseEntity<String>("success", HttpStatus.OK);
     }
 
     @GetMapping("/post/like/{id}/get")
@@ -131,6 +135,8 @@ public class TimelineController {
     public ResponseEntity<List<LikeDTO>> getPostLike(@PathVariable("id") Long id) {
     	List<Like> likes = likeService.findAllLikes(id);
     	List<LikeDTO> likesToView = LikeDTO.convertToDTOList(likes);
+    	
+    	
     	return new ResponseEntity<List<LikeDTO>>(likesToView, HttpStatus.OK);
     }
     
