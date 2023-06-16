@@ -300,7 +300,7 @@
 						$(item).html(null);
 						$.each(response, function(index, row) {
 							console.log(row);
-							$(item).append("<a href='/profile/@"+row.userName+"'>"+"<img class='profile-photo-like' src='/profile/photo/"+row.userProfilePhoto+"'"+"</a>");
+							$(item).append("<a href='/profile/@"+row.userName+"' title='@"+row.userName+"'>"+"<img class='profile-photo-like' src='/profile/photo/"+row.userProfilePhoto+"'"+"</a>");
 						});
 					},
 					error: function(error) {
